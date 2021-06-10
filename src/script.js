@@ -166,6 +166,14 @@ const tick = () => {
     // Update controls
     controls.update()
 
+    camera.position.z += (camera.position.z <= 5) ? 0.01: 0
+    camera.position.x += (camera.position.x <= 1) ? 0.01: 0
+    camera.position.y += (camera.position.y <= 1) ? 0.01: 0
+
+    camera.position.z += (camera.position.z > 5) ? -0.01: 0
+    camera.position.x += (camera.position.x > 1) ? -0.01: 0
+    camera.position.y += (camera.position.y > 1) ? -0.01: 0
+
     // Render
     renderer.render(scene, camera)
 

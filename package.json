@@ -1,6 +1,7 @@
 {
-  "repository": "#",
-  "license": "UNLICENSED",
+  "name": "lesson-13",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "build": "webpack --config ./bundler/webpack.prod.js",
     "dev": "webpack serve --config ./bundler/webpack.dev.js"
