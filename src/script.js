@@ -26,15 +26,46 @@ const axesHelper = new THREE.AxesHelper()
 const textureLoader = new THREE.TextureLoader()
 const cubeTextureLoader = new THREE.CubeTextureLoader()
 
+//  
 const matcapTexture = textureLoader.load('/textures/matcaps/5.png')
-const environmentMapTexture = cubeTextureLoader.load([
-    '/textures/environmentMaps/0/px.png',
-    '/textures/environmentMaps/0/nx.png',
-    '/textures/environmentMaps/0/py.png',
-    '/textures/environmentMaps/0/ny.png',
-    '/textures/environmentMaps/0/pz.png',
-    '/textures/environmentMaps/0/nz.png'
-])
+const environmentMapTextures = {
+    0: cubeTextureLoader.load([
+        '/textures/environmentMaps/0/px.png',
+        '/textures/environmentMaps/0/nx.png',
+        '/textures/environmentMaps/0/py.png',
+        '/textures/environmentMaps/0/ny.png',
+        '/textures/environmentMaps/0/pz.png',
+        '/textures/environmentMaps/0/nz.png'
+    ]),
+    1: cubeTextureLoader.load([
+        '/textures/environmentMaps/1/px.png',
+        '/textures/environmentMaps/1/nx.png',
+        '/textures/environmentMaps/1/py.png',
+        '/textures/environmentMaps/1/ny.png',
+        '/textures/environmentMaps/1/pz.png',
+        '/textures/environmentMaps/1/nz.png'
+    ]),
+    2: cubeTextureLoader.load([
+        '/textures/environmentMaps/2/px.png',
+        '/textures/environmentMaps/2/nx.png',
+        '/textures/environmentMaps/2/py.png',
+        '/textures/environmentMaps/2/ny.png',
+        '/textures/environmentMaps/2/pz.png',
+        '/textures/environmentMaps/2/nz.png'
+    ]),
+    3: cubeTextureLoader.load([
+        '/textures/environmentMaps/3/px.png',
+        '/textures/environmentMaps/3/nx.png',
+        '/textures/environmentMaps/3/py.png',
+        '/textures/environmentMaps/3/ny.png',
+        '/textures/environmentMaps/3/pz.png',
+        '/textures/environmentMaps/3/nz.png'
+    ]),
+
+}
+
+
+
 
 /**
  * Fonts
@@ -57,20 +88,15 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
 
     textGeometry.center()
     const material = new THREE.MeshBasicMaterial({ wireframe: true })
-
     const textMaterial = new THREE.MeshStandardMaterial()
+    const bigSphereMaterial = new THREE.MeshBasicMaterial()
+    bigSphereMaterial.transparent = true
+    bigSphereMaterial.opacity = 0.5  
+    
     textMaterial.metalness = 1
     textMaterial.roughness = 0
-    textMaterial.envMap = environmentMapTexture
-
-    const guiTextMaterial = gui.addFolder('Metalic Forms')
-    const guiMaterial = gui.addFolder('colored Forms')
-    guiTextMaterial.add(textMaterial, 'metalness').min(0).max(1).step(0.0001)
-    guiTextMaterial.add(textMaterial, 'roughness').min(0).max(1).step(0.0001)
-    guiMaterial.add(material, 'wireframe')
-    const text = new THREE.Mesh(textGeometry, textMaterial)
-    scene.add(text)
-
+    textMaterial.envMap = environmentMapTextures[0]
+    
     /**
      * Colors
      */
@@ -79,23 +105,48 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
         green: Math.floor(Math.random() * 255),
         blue: Math.floor(Math.random() * 255)
     }
-
-    const guiColorFolder = guiMaterial.addFolder('Colors')
-    guiColorFolder.add(colors, 'red').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
-    guiColorFolder.add(colors, 'green').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
-    guiColorFolder.add(colors, 'blue').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
-
+    bigSphereMaterial.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`)  
     material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`)
+
+    /**
+     * GUI
+     */
+    const guiTextMaterial = gui.addFolder('Metalic Forms')
+    const guiMaterial = gui.addFolder('colored Forms')
+    const guiColorFolder = guiMaterial.addFolder('Colors')
+    guiTextMaterial.add(textMaterial, 'metalness').min(0).max(1).step(0.0001)
+    guiTextMaterial.add(textMaterial, 'roughness').min(0).max(1).step(0.0001)
+    guiMaterial.add(material, 'wireframe')
+    guiColorFolder.add(colors, 'red').min(0).max(255).step(1).onChange(function () { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) });
+    guiColorFolder.add(colors, 'green').min(0).max(255).step(1).onChange(function () { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) });
+    guiColorFolder.add(colors, 'blue').min(0).max(255).step(1).onChange(function () { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) });
+   /*  gui.addColor(bigSphereMaterial, 'color').onChange(function(colorValue) {
+        colorValue=colorValue.replace( '#','0x' );
+        bigSphereMaterial.color = new THREE.Color(colorValue)
+    }) */
+    
     const donutGeometry = new THREE.TorusBufferGeometry(0.3, 0.2, 20, 45)
     const boxGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
     const sphereGeometry = new THREE.SphereGeometry(0.25, 32, 32)
+    const bigSphereGeometry = new THREE.SphereGeometry(8, 1024, 1024)
+    
+    const text = new THREE.Mesh(textGeometry, textMaterial)
+    const bigSphere = new THREE.Mesh(bigSphereGeometry, bigSphereMaterial)
+    scene.add(text, bigSphere)
+    
 
 
+    const numberOfObjects = Object.keys(environmentMapTextures).length - 1
+    // environmentMapTextures[Math.floor(Math.random() * numberOfObjects)]
     for (let i = 0; i < 100; i++) {
+        const sphereMaterial = new THREE.MeshStandardMaterial({ metalness: 1, roughness: 0 })
+        sphereMaterial.envMap = environmentMapTextures[Math.floor(Math.random() * numberOfObjects)]
+        console.log(Math.floor(Math.random() * numberOfObjects))
+
         const donut = new THREE.Mesh(donutGeometry, material)
         const sphere = new THREE.Mesh(sphereGeometry, material)
-        const box = new THREE.Mesh(boxGeometry, textMaterial)
-        const glasssphere = new THREE.Mesh(sphereGeometry, textMaterial)
+        const box = new THREE.Mesh(boxGeometry, material)
+        const glasssphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
 
         changePositionOfMesh(donut)
         changePositionOfMesh(sphere)
@@ -188,11 +239,11 @@ const tick = () => {
 
     // Update controls
     controls.update()
-    if(cameraAttributes.moving){
+    if (cameraAttributes.moving) {
         camera.position.x += (camera.position.x <= cameraAttributes.movingToX) ? cameraAttributes.movingSpeed : 0
         camera.position.y += (camera.position.y <= cameraAttributes.movingToY) ? cameraAttributes.movingSpeed : 0
         camera.position.z += (camera.position.z <= cameraAttributes.movingToZ) ? cameraAttributes.movingSpeed : 0
-    
+
         camera.position.x += (camera.position.x > cameraAttributes.movingToX) ? -cameraAttributes.movingSpeed : 0
         camera.position.y += (camera.position.y > cameraAttributes.movingToY) ? -cameraAttributes.movingSpeed : 0
         camera.position.z += (camera.position.z > cameraAttributes.movingToZ) ? -cameraAttributes.movingSpeed : 0
