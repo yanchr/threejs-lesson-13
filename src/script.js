@@ -18,7 +18,7 @@ const scene = new THREE.Scene()
 
 // Axes
 const axesHelper = new THREE.AxesHelper()
-scene.add(axesHelper)
+//cene.add(axesHelper)
 
 /**
  * Textures
@@ -65,8 +65,6 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
 
     gui.add(textMaterial, 'metalness').min(0).max(1).step(0.0001)
     gui.add(textMaterial, 'roughness').min(0).max(1).step(0.0001)
-    gui.add(textMaterial, 'aoMapIntensity').min(0).max(10).step(0.0001)
-    gui.add(textMaterial, 'displacementScale').min(0).max(1).step(0.0001)
 
     const text = new THREE.Mesh(textGeometry, textMaterial)
 
