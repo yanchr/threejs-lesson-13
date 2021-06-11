@@ -18,14 +18,14 @@ const scene = new THREE.Scene()
 
 // Axes
 const axesHelper = new THREE.AxesHelper()
-//cene.add(axesHelper)
+//scene.add(axesHelper)
 
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
 const cubeTextureLoader = new THREE.CubeTextureLoader()
- 
+
 const matcapTexture = textureLoader.load('/textures/matcaps/5.png')
 const environmentMapTexture = cubeTextureLoader.load([
     '/textures/environmentMaps/0/px.png',
@@ -65,15 +65,24 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
 
     gui.add(textMaterial, 'metalness').min(0).max(1).step(0.0001)
     gui.add(textMaterial, 'roughness').min(0).max(1).step(0.0001)
-
     const text = new THREE.Mesh(textGeometry, textMaterial)
-
-    
-
-
-
     scene.add(text)
 
+    /**
+     * Colors
+     */
+    var colors = {
+        red: Math.floor(Math.random() * 255),
+        green: Math.floor(Math.random() * 255),
+        blue: Math.floor(Math.random() * 255)
+    }
+
+    const colorFolder = gui.addFolder('Colors')
+    colorFolder.add(colors, 'red').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
+    colorFolder.add(colors, 'green').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
+    colorFolder.add(colors, 'blue').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
+
+    material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`)
     const donutGeometry = new THREE.TorusBufferGeometry(0.3, 0.2, 20, 45)
     const boxGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
     const sphereGeometry = new THREE.SphereGeometry(0.25, 32, 32)
@@ -84,7 +93,6 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
         const sphere = new THREE.Mesh(sphereGeometry, material)
         const box = new THREE.Mesh(boxGeometry, textMaterial)
         const glasssphere = new THREE.Mesh(sphereGeometry, textMaterial)
-        material.color.set(`#${Math.floor(Math.random() * 10)}0${Math.floor(Math.random() * 10)}0${Math.floor(Math.random() * 10)}0`)
 
         changePositionOfMesh(donut)
         changePositionOfMesh(sphere)
@@ -164,13 +172,13 @@ const tick = () => {
     // Update controls
     controls.update()
 
-    camera.position.z += (camera.position.z <= 5) ? 0.01: 0
-    camera.position.x += (camera.position.x <= 1) ? 0.01: 0
-    camera.position.y += (camera.position.y <= 1) ? 0.01: 0
+    camera.position.z += (camera.position.z <= 5) ? 0.01 : 0
+    camera.position.x += (camera.position.x <= 1) ? 0.01 : 0
+    camera.position.y += (camera.position.y <= 1) ? 0.01 : 0
 
-    camera.position.z += (camera.position.z > 5) ? -0.01: 0
-    camera.position.x += (camera.position.x > 1) ? -0.01: 0
-    camera.position.y += (camera.position.y > 1) ? -0.01: 0
+    camera.position.z += (camera.position.z > 5) ? -0.01 : 0
+    camera.position.x += (camera.position.x > 1) ? -0.01 : 0
+    camera.position.y += (camera.position.y > 1) ? -0.01 : 0
 
     // Render
     renderer.render(scene, camera)
