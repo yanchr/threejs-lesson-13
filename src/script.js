@@ -63,8 +63,11 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     textMaterial.roughness = 0
     textMaterial.envMap = environmentMapTexture
 
-    gui.add(textMaterial, 'metalness').min(0).max(1).step(0.0001)
-    gui.add(textMaterial, 'roughness').min(0).max(1).step(0.0001)
+    const guiTextMaterial = gui.addFolder('Metalic Forms')
+    const guiMaterial = gui.addFolder('colored Forms')
+    guiTextMaterial.add(textMaterial, 'metalness').min(0).max(1).step(0.0001)
+    guiTextMaterial.add(textMaterial, 'roughness').min(0).max(1).step(0.0001)
+    guiMaterial.add(material, 'wireframe')
     const text = new THREE.Mesh(textGeometry, textMaterial)
     scene.add(text)
 
@@ -77,10 +80,10 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
         blue: Math.floor(Math.random() * 255)
     }
 
-    const colorFolder = gui.addFolder('Colors')
-    colorFolder.add(colors, 'red').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
-    colorFolder.add(colors, 'green').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
-    colorFolder.add(colors, 'blue').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
+    const guiColorFolder = guiMaterial.addFolder('Colors')
+    guiColorFolder.add(colors, 'red').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
+    guiColorFolder.add(colors, 'green').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
+    guiColorFolder.add(colors, 'blue').min(0).max(255).step(1).onChange( function() { material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`) } );
 
     material.color.set(`rgb(${colors.red}, ${colors.green}, ${colors.blue})`)
     const donutGeometry = new THREE.TorusBufferGeometry(0.3, 0.2, 20, 45)
@@ -148,6 +151,20 @@ camera.position.y = 1
 camera.position.z = 2
 scene.add(camera)
 
+const cameraAttributes = {
+    moving: true,
+    movingToX: 1,
+    movingToY: 1,
+    movingToZ: 5,
+    movingSpeed: 0.01
+}
+const guiCamera = gui.addFolder('Camera')
+guiCamera.add(cameraAttributes, ('moving'))
+guiCamera.add(cameraAttributes, ('movingToX')).min(-10).max(10)
+guiCamera.add(cameraAttributes, ('movingToY')).min(-10).max(10)
+guiCamera.add(cameraAttributes, ('movingToZ')).min(-10).max(10)
+guiCamera.add(cameraAttributes, ('movingSpeed')).min(0).max(0.05).step(0.001)
+
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
@@ -171,14 +188,15 @@ const tick = () => {
 
     // Update controls
     controls.update()
-
-    camera.position.z += (camera.position.z <= 5) ? 0.01 : 0
-    camera.position.x += (camera.position.x <= 1) ? 0.01 : 0
-    camera.position.y += (camera.position.y <= 1) ? 0.01 : 0
-
-    camera.position.z += (camera.position.z > 5) ? -0.01 : 0
-    camera.position.x += (camera.position.x > 1) ? -0.01 : 0
-    camera.position.y += (camera.position.y > 1) ? -0.01 : 0
+    if(cameraAttributes.moving){
+        camera.position.x += (camera.position.x <= cameraAttributes.movingToX) ? cameraAttributes.movingSpeed : 0
+        camera.position.y += (camera.position.y <= cameraAttributes.movingToY) ? cameraAttributes.movingSpeed : 0
+        camera.position.z += (camera.position.z <= cameraAttributes.movingToZ) ? cameraAttributes.movingSpeed : 0
+    
+        camera.position.x += (camera.position.x > cameraAttributes.movingToX) ? -cameraAttributes.movingSpeed : 0
+        camera.position.y += (camera.position.y > cameraAttributes.movingToY) ? -cameraAttributes.movingSpeed : 0
+        camera.position.z += (camera.position.z > cameraAttributes.movingToZ) ? -cameraAttributes.movingSpeed : 0
+    }
 
     // Render
     renderer.render(scene, camera)
